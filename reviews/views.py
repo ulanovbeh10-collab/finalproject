@@ -1,0 +1,51 @@
+from django.shortcuts import render, get_object_or_404, redirect
+from django.contrib.auth.decorators import login_required
+from .models import Dish, UserProfile, Category
+from .forms import DishForm
+
+
+def home(request):
+    query = request.GET.get('q', '')
+    category_id = request.GET.get('category', '')
+
+    dishes = Dish.objects.all()
+
+    if query:
+        dishes = dishes.filter(title__icontains=query) | dishes.filter(place__icontains=query)
+
+    if category_id:
+        dishes = dishes.filter(category_id=category_id)
+
+    categories = Category.objects.all()
+
+    return render(request, 'reviews/home.html', {
+        'dishes': dishes,
+        'categories': categories,
+        'query': query,
+        'selected_category': category_id,
+    })
+
+
+def dish_detail(request, pk):
+    dish = get_object_or_404(Dish, pk=pk)
+    return render(request, 'reviews/dish_detail.html', {'dish': dish})
+
+
+@login_required
+def profile(request):
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    return render(request, 'reviews/profile.html', {'profile': user_profile})
+
+
+@login_required
+def add_dish(request):
+    if request.method == 'POST':
+        form = DishForm(request.POST, request.FILES)
+        if form.is_valid():
+            dish = form.save(commit=False)
+            dish.author = request.user
+            dish.save()
+            return redirect('home')
+    else:
+        form = DishForm()
+    return render(request, 'reviews/add_dish.html', {'form': form})
