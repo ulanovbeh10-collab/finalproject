@@ -2,6 +2,9 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from .models import Dish, UserProfile, Category
 from .forms import DishForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, logout
+from django.contrib.auth.decorators import login_required
 
 
 def home(request):
@@ -49,3 +52,46 @@ def add_dish(request):
     else:
         form = DishForm()
     return render(request, 'reviews/add_dish.html', {'form': form})
+
+
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, logout
+
+
+def register_view(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = UserCreationForm()
+    return render(request, 'reviews/register.html', {'form': form})
+
+
+def login_view(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            return redirect('home')
+    else:
+        form = AuthenticationForm()
+    return render(request, 'reviews/login.html', {'form': form})
+
+
+
+def logout_view(request):
+    logout(request)
+    return redirect('home')
+
+
+@login_required(login_url='login')
+def profile(request):
+    ...
+
+@login_required(login_url='login')
+def add_dish(request):
+    ...
