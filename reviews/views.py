@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
+from django.http import HttpResponseForbidden
 
 from .models import Dish, UserProfile, Category
 from .forms import DishForm
@@ -35,17 +36,6 @@ def dish_detail(request, pk):
 
 
 @login_required(login_url='login')
-def profile(request):
-    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-    user_dishes = Dish.objects.filter(author=request.user)
-
-    return render(request, 'reviews/profile.html', {
-        'profile': user_profile,
-        'dishes': user_dishes
-    })
-
-
-@login_required(login_url='login')
 def add_dish(request):
     if request.method == 'POST':
         form = DishForm(request.POST, request.FILES)
@@ -58,6 +48,51 @@ def add_dish(request):
         form = DishForm()
 
     return render(request, 'reviews/add_dish.html', {'form': form})
+
+
+@login_required(login_url='login')
+def edit_dish(request, pk):
+    dish = get_object_or_404(Dish, pk=pk)
+
+    # Проверка: если текущий юзер не автор — запрещаем доступ!
+    if dish.author != request.user:
+        return HttpResponseForbidden("Вы можете редактировать только свои обзоры!")
+
+    if request.method == 'POST':
+        form = DishForm(request.POST, request.FILES, instance=dish)
+        if form.is_valid():
+            form.save()
+            return redirect('dish_detail', pk=dish.pk)
+    else:
+        form = DishForm(instance=dish)
+
+    return render(request, 'reviews/edit_dish.html', {'form': form, 'dish': dish})
+
+
+@login_required(login_url='login')
+def delete_dish(request, pk):
+    dish = get_object_or_404(Dish, pk=pk)
+
+    # Проверка: если текущий юзер не автор — запрещаем доступ!
+    if dish.author != request.user:
+        return HttpResponseForbidden("Вы можете удалять только свои обзоры!")
+
+    if request.method == 'POST':
+        dish.delete()
+        return redirect('home')
+
+    return render(request, 'reviews/delete_confirm.html', {'dish': dish})
+
+
+@login_required(login_url='login')
+def profile(request):
+    user_profile, created = UserProfile.objects.get_or_create(user=request.user)
+    user_dishes = Dish.objects.filter(author=request.user)
+
+    return render(request, 'reviews/profile.html', {
+        'profile': user_profile,
+        'dishes': user_dishes
+    })
 
 
 def register_view(request):

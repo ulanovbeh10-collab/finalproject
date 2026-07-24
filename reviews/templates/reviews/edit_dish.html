@@ -2,26 +2,25 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Добавить обзор — BiteRank</title>
+    <title>Редактировать обзор — BiteRank</title>
     <style>
         body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; margin: 30px; }
         .container { max-width: 600px; background: #1e1e1e; padding: 25px; border-radius: 12px; border: 1px solid #333; margin: 0 auto; }
         input, select, textarea { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: #fff; box-sizing: border-box; }
-        .btn-submit { background: #4caf50; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-submit { background: #ff9800; color: #fff; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .btn-back { background: #333; color: white; padding: 8px 15px; border-radius: 6px; text-decoration: none; display: inline-block; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <a href="{% url 'home' %}" class="btn-back">← На главную</a>
-        <h2>➕ Добавить новый обзор</h2>
+        <a href="{% url 'dish_detail' pk=dish.pk %}" class="btn-back">← Назад к обзору</a>
+        <h2>✏️ Редактировать обзор: {{ dish.title }}</h2>
 
-        <!-- ОБЯЗАТЕЛЬНО enctype для загрузки файлов -->
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
-            <button type="submit" class="btn-submit">Опубликовать</button>
+            <button type="submit" class="btn-submit">Сохранить изменения</button>
         </form>
     </div>
 

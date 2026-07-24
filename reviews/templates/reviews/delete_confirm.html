@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Удаление обзора — BiteRank</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; margin: 30px; }
+        .container { max-width: 500px; background: #1e1e1e; padding: 25px; border-radius: 12px; border: 1px solid #333; margin: 0 auto; text-align: center; }
+        .btn-danger { background: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        .btn-cancel { background: #333; color: white; padding: 10px 20px; border-radius: 6px; text-decoration: none; display: inline-block; margin-left: 10px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🗑️ Удаление обзора</h2>
+        <p>Вы уверены, что хотите удалить обзор <strong>«{{ dish.title }}»</strong>?</p>
+
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn-danger">Да, удалить</button>
+            <a href="{% url 'dish_detail' pk=dish.pk %}" class="btn-cancel">Отмена</a>
+        </form>
+    </div>
+
+</body>
+</html>
