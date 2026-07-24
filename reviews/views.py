@@ -1,10 +1,10 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
-from .models import Dish, UserProfile, Category
-from .forms import DishForm
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth import login, logout
-from django.contrib.auth.decorators import login_required
+
+from .models import Dish, UserProfile, Category
+from .forms import DishForm
 
 
 def home(request):
@@ -34,13 +34,18 @@ def dish_detail(request, pk):
     return render(request, 'reviews/dish_detail.html', {'dish': dish})
 
 
-@login_required
+@login_required(login_url='login')
 def profile(request):
     user_profile, created = UserProfile.objects.get_or_create(user=request.user)
-    return render(request, 'reviews/profile.html', {'profile': user_profile})
+    user_dishes = Dish.objects.filter(author=request.user)
+
+    return render(request, 'reviews/profile.html', {
+        'profile': user_profile,
+        'dishes': user_dishes
+    })
 
 
-@login_required
+@login_required(login_url='login')
 def add_dish(request):
     if request.method == 'POST':
         form = DishForm(request.POST, request.FILES)
@@ -51,11 +56,8 @@ def add_dish(request):
             return redirect('home')
     else:
         form = DishForm()
+
     return render(request, 'reviews/add_dish.html', {'form': form})
-
-
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth import login, logout
 
 
 def register_view(request):
@@ -82,16 +84,6 @@ def login_view(request):
     return render(request, 'reviews/login.html', {'form': form})
 
 
-
 def logout_view(request):
     logout(request)
     return redirect('home')
-
-
-@login_required(login_url='login')
-def profile(request):
-    ...
-
-@login_required(login_url='login')
-def add_dish(request):
-    ...
