@@ -1,18 +1,25 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Вход — BiteRank</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #121212; color: #e0e0e0; padding: 40px; }
+        .container { max-width: 400px; margin: 0 auto; background: #1e1e1e; padding: 30px; border-radius: 10px; border: 1px solid #333; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; border-radius: 6px; border: 1px solid #444; background: #2a2a2a; color: white; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background: #4caf50; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; }
+        a { color: #2196f3; text-decoration: none; display: inline-block; margin-top: 15px; }
+    </style>
 </head>
 <body>
-
-<h2>Вход на сайт</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Войти</button>
-</form>
-<a href="{% url 'register' %}">Нет аккаунта? Зарегистрироваться</a>
-
+    <div class="container">
+        <h2>Вход на сайт</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Войти</button>
+        </form>
+        <a href="{% url 'register' %}">Нет аккаунта? Зарегистрироваться</a>
+    </div>
 </body>
 </html>
