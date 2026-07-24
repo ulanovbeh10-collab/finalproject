@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 
 class Category(models.Model):
@@ -16,25 +17,22 @@ class Category(models.Model):
 class Dish(models.Model):
     title = models.CharField(max_length=200, verbose_name="Название блюда")
     place = models.CharField(max_length=200, verbose_name="Заведение")
-    description = models.TextField(blank=True, verbose_name="Описание")
-    rating = models.IntegerField(default=5, verbose_name="Оценка (1-10)")
-    image = models.ImageField(upload_to='dishes/', blank=True, null=True, verbose_name="Картинка")
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="Категория")
-    author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='dishes', verbose_name="Автор")
-    created_at = models.DateTimeField(auto_now_add=True, verbose_name="Дата создания")
+    rating = models.IntegerField(
+        validators=[
+            MinValueValidator(1, message="Оценка не может быть меньше 1"),
+            MaxValueValidator(10, message="Оценка не может быть больше 10")
+        ],
+        verbose_name="Оценка (1-10)"
+    )
+    description = models.TextField(blank=True, verbose_name="Описание / Отзыв")
+    image = models.ImageField(upload_to='dishes/', blank=True, null=True, verbose_name="Изображение")
+    author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name="Автор")
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.title} ({self.place})"
+        return f"{self.title} - {self.place}"
 
     class Meta:
-        verbose_name = "Обзор блюда"
-        verbose_name_plural = "Обзоры блюд"
-
-
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profile')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name="Аватар")
-    bio = models.TextField(blank=True, verbose_name="О себе")
-
-    def __str__(self):
-        return f"Профиль {self.user.username}"
+        verbose_name = "Блюдо"
+        verbose_name_plural = "Блюда"
